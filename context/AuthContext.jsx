@@ -24,17 +24,21 @@ export function AuthProvider({ children }) {
         setTokenLoading(false);
         return;
       }
-      const saved = localStorage.getItem(TOKEN_KEY);
-      if (saved) {
-        setToken(saved);
-        setTokenLoading(false);
-        return;
+      try {
+        const saved = JSON.parse(localStorage.getItem(TOKEN_KEY) || "null");
+        if (saved && saved.email === rawUser.email && saved.token) {
+          setToken(saved.token);
+          setTokenLoading(false);
+          return;
+        }
+      } catch {
+        // corrupted storage, fall through to refetch
       }
       try {
         const res = await fetch("/api/jwt");
         const data = await res.json();
         if (data.token) {
-          localStorage.setItem(TOKEN_KEY, data.token);
+          localStorage.setItem(TOKEN_KEY, JSON.stringify({ token: data.token, email: rawUser.email }));
           setToken(data.token);
         }
       } finally {
@@ -56,7 +60,7 @@ export function AuthProvider({ children }) {
     const res = await fetch("/api/jwt");
     const jwtData = await res.json();
     if (jwtData.token) {
-      localStorage.setItem(TOKEN_KEY, jwtData.token);
+      localStorage.setItem(TOKEN_KEY, JSON.stringify({ token: jwtData.token, email }));
       setToken(jwtData.token);
     }
     return data;

@@ -19,7 +19,10 @@ function MyBookedSessionsContent() {
     setLoading(true);
     apiFetch(`/my-bookings?email=${encodeURIComponent(user.email)}`, { token })
       .then(setBookings)
-      .catch(() => setBookings([]))
+      .catch((err) => {
+        toast.error(err.message || "Failed to load your bookings");
+        setBookings([]);
+      })
       .finally(() => setLoading(false));
   }, [user, token]);
 

@@ -21,7 +21,10 @@ function MyTutorsContent() {
     setLoading(true);
     apiFetch(`/my-tutors?email=${encodeURIComponent(user.email)}`, { token })
       .then(setTutors)
-      .catch(() => setTutors([]))
+      .catch((err) => {
+        toast.error(err.message || "Failed to load your tutors");
+        setTutors([]);
+      })
       .finally(() => setLoading(false));
   }, [user, token]);
 
