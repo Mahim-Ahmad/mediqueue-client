@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
@@ -8,8 +8,14 @@ import { UserPlus, Eye, EyeOff } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
 
 export default function Register() {
-  const { registerUser, loginWithGoogle } = useAuth();
+  const { user, loading: authLoading, registerUser, loginWithGoogle } = useAuth();
   const router = useRouter();
+
+  useEffect(() => {
+    if (!authLoading && user) {
+      router.replace("/");
+    }
+  }, [authLoading, user, router]);
 
   const [form, setForm] = useState({ name: "", email: "", photoURL: "", password: "" });
   const [showPassword, setShowPassword] = useState(false);

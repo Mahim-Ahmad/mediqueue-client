@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, Suspense } from "react";
+import { useState, Suspense, useEffect } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import toast from "react-hot-toast";
@@ -8,10 +8,16 @@ import { LogIn, Eye, EyeOff } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
 
 function LoginForm() {
-  const { loginUser, loginWithGoogle } = useAuth();
+  const { user, loading: authLoading, loginUser, loginWithGoogle } = useAuth();
   const router = useRouter();
   const searchParams = useSearchParams();
   const from = searchParams.get("from") || "/";
+
+  useEffect(() => {
+    if (!authLoading && user) {
+      router.replace(from);
+    }
+  }, [authLoading, user, router, from]);
 
   const [form, setForm] = useState({ email: "", password: "" });
   const [showPassword, setShowPassword] = useState(false);
